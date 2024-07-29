@@ -1,0 +1,4 @@
+name: rna
+channels:
+  - defaults
+prefix: /home/yxia/miniconda3/envs/rna
