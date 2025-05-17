@@ -1,20 +1,56 @@
-### Workflow
+# sgRNA Design
 
-1. **Prepare AF3 Input Files**
-   Run `prepare_af3_inputs.py` to generate input JSON files for AlphaFold3.
-   This script reads a FASTA file and a JSON template, then creates customized JSON files for each input sequence, updating sequence information and saving the results to a specified directory.
+design sgrna handle of crispr cas9
 
-2. **Run AlphaFold3 Prediction**
-   Execute AlphaFold3 using the following command (modify paths as needed):
+## wildtype 61 nt
 
-   ```bash
-   current_dir=$(pwd)
-   cd <path_to_alphafold3>
-   python run_alphafold.py --db_dir=<path_to_afdb> --input_dir=$current_dir --model_dir=<model_dir> --output_dir=<output_dir>
-   ```
+```text
+gttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtg
+```
 
-   Refer to the AlphaFold3 documentation for details on required parameters.
+sites to fix:
 
-3. **Select Sequences Based on AF3 Confidence**
-   Run `select_seq_based_on_af_confidence.py` to filter sequences according to AF3 confidence scores.
-   This script reads AF3 output files, extracts confidence metrics, and selects sequences that meet the specified threshold.
+```text
+G43, G53, G27, U44, A51
+```
+
+## Setup
+
+```bash
+git clone https://github.com/bitguolab/sgrna_design.git
+cd sgrna_design
+gunzip repeats-90_rep_seq.fasta.gz
+conda env create -f environment.yml
+```
+
+## Training data
+
+**[CRISPRCasdb direct repeats](https://crisprcas.i2bc.paris-saclay.fr/Home/DownloadFile?filename=dr_34.zip)**, **[hmp1-II-crispr-repeats](https://github.com/biobakery/crispr2020/releases/download/v1/hmp1-II-crispr-repeats.tar.gz)**
+remove blank lines in `hmp1-II-crispr-repeats` and cluster `dr_34` and `hmp1-II-crispr-repeats` using `mmseqs2` at 90% identity.
+
+
+## Train
+
+```bash
+cd crgen
+python cr_gen.py
+```
+
+
+## Run
+
+```bash
+usage: sample.py [-h] [--n_samples N_SAMPLES] [--mutation_number MUTATION_NUMBER] [--temperature TEMPERATURE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --n_samples N_SAMPLES
+                        number of samples to generate
+  --mutation_number MUTATION_NUMBER
+                        number of mutations
+  --temperature TEMPERATURE
+                        temperature
+```
+
+## AlphaFold3-based filter
+See `af3_filer/README.md`.
